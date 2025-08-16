@@ -26,7 +26,7 @@ export default function HomePage() {
         </Heading>
 
         <Text fontSize="lg" color="gray.600" textAlign="center">
-          Instant text sharing via a simple link.
+          A shared clipboard between devices, via a simple link.
         </Text>
 
         <Button
