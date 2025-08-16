@@ -7,7 +7,6 @@ import HomePage from "./HomePage.jsx";
 import ReactGA from "react-ga4";
 
 const GA_CODE = import.meta.env.VITE_GA_CODE;
-console.log(GA_CODE)
 ReactGA.initialize(`G-${GA_CODE}`);
 ReactGA.send("pageview");
 ReactDOM.createRoot(document.getElementById("root")).render(
