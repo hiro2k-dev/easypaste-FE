@@ -9,15 +9,20 @@ import {
   Heading,
   VStack,
   Container,
+  Flex,
 } from "@chakra-ui/react";
+import { useClipboard, useToast } from "@chakra-ui/react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SessionPage() {
+  const toast = useToast();
+  const url = window.location.href;
   const { code } = useParams();
   const [text, setText] = useState("");
   const [retrieved, setRetrieved] = useState("");
-  const [status, setStatus] = useState("");
+  const { onCopy: copyUrl } = useClipboard(url);
+  const { onCopy: copyText } = useClipboard(retrieved || "");
 
   const publish = async () => {
     try {
@@ -26,9 +31,19 @@ export default function SessionPage() {
         content: text,
         code,
       });
-      setStatus("✅ Text sent");
+      toast({
+        title: "Text sent",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
     } catch (err) {
-      setStatus("❌ Failed to send");
+      toast({
+        title: "Failed to send text",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -37,7 +52,7 @@ export default function SessionPage() {
       const res = await axios.get(`${API_URL}/api/get/${code}`);
       setRetrieved(res.data.content);
     } catch (err) {
-      setRetrieved("❌ Not found");
+      setRetrieved("");
     }
   };
 
@@ -47,8 +62,30 @@ export default function SessionPage() {
 
   return (
     <Container maxW="2xl" py={6}>
-      <VStack spacing={6} align="stretch">
-        <Heading size="lg">Easy Paster: Session {code}</Heading>
+      <VStack spacing={2} align="stretch">
+        <Flex
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Heading size="lg">Easy Paster: Session {code}</Heading>
+
+          <Button
+            size="sm"
+            onClick={() => {
+              copyUrl();
+              toast({
+                title: "URL copied",
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+              });
+            }}
+          >
+            Copy
+          </Button>
+        </Flex>
 
         <Textarea
           placeholder="Type something to share..."
@@ -61,15 +98,32 @@ export default function SessionPage() {
         <Button colorScheme="blue" onClick={publish}>
           Send Text
         </Button>
-        <Text>{status}</Text>
 
         <Button colorScheme="green" onClick={retrieve}>
           Refresh
         </Button>
 
-        <Box p={4} borderWidth={1} rounded="md" bg="gray.50">
-          <pre style={{ whiteSpace: "pre-wrap" }}>{retrieved}</pre>
-        </Box>
+        {retrieved && (
+          <>
+            <Box p={4} borderWidth={1} rounded="md" bg="gray.50">
+              <pre style={{ whiteSpace: "pre-wrap" }}>{retrieved}</pre>
+            </Box>
+            <Button
+              size="sm"
+              onClick={() => {
+                copyText();
+                toast({
+                  title: "Text copied",
+                  status: "success",
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            >
+              Copy Shared Text
+            </Button>
+          </>
+        )}
       </VStack>
     </Container>
   );

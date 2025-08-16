@@ -1,4 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Heading,
+  VStack,
+  Container,
+  Text,
+} from "@chakra-ui/react";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -9,14 +17,24 @@ export default function HomePage() {
   };
 
   return (
-    <div className="p-4 text-center space-y-4">
-      <h1 className="text-xl font-bold">Easy Paster</h1>
-      <button
-        onClick={createSession}
-        className="bg-blue-600 text-white px-6 py-3 rounded"
-      >
-        New session
-      </button>
-    </div>
+    <Container maxW="lg" py={20} centerContent>
+      <VStack spacing={6}>
+        <Heading size="xl" textAlign="center">
+          Easy Paster
+        </Heading>
+        <Text fontSize="lg" color="gray.600" textAlign="center">
+          Instant text sharing via a simple link.
+        </Text>
+        <Button
+          onClick={createSession}
+          colorScheme="teal"
+          size="lg"
+          px={8}
+          py={6}
+        >
+          New session
+        </Button>
+      </VStack>
+    </Container>
   );
 }
