@@ -105,9 +105,6 @@ export default function SessionPage() {
 
         {retrieved && (
           <>
-            <Box p={4} borderWidth={1} rounded="md" bg="gray.50">
-              <pre style={{ whiteSpace: "pre-wrap" }}>{retrieved}</pre>
-            </Box>
             <Button
               size="sm"
               onClick={() => {
@@ -122,6 +119,9 @@ export default function SessionPage() {
             >
               Copy Shared Text
             </Button>
+            <Box p={4} borderWidth={1} rounded="md" bg="gray.50">
+              <pre style={{ whiteSpace: "pre-wrap" }}>{retrieved}</pre>
+            </Box>
           </>
         )}
       </VStack>
