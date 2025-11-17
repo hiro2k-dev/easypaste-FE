@@ -257,7 +257,7 @@ export default function SessionPage() {
               }}
             />
 
-            <Button onClick={uploadFile} colorScheme="purple" mt={4} w="100%">
+            <Button onClick={uploadFile} colorScheme="purple" mt="12px" w="100%">
               Upload File
             </Button>
 
@@ -281,7 +281,7 @@ export default function SessionPage() {
           <Box order={{ base: 2, md: 1 }}>
             <Textarea
               placeholder="Type something to share..."
-              rows={10}
+              height="214px"
               resize="vertical"
               value={text}
               onChange={(e) => setText(e.target.value)}
