@@ -257,7 +257,13 @@ export default function SessionPage() {
               }}
             />
 
-            <Button onClick={uploadFile} colorScheme="purple" mt="12px" w="100%">
+            <Button
+              isDisabled={!file}
+              onClick={uploadFile}
+              colorScheme="purple"
+              mt="12px"
+              w="100%"
+            >
               Upload File
             </Button>
 
@@ -272,9 +278,7 @@ export default function SessionPage() {
                 </Button>
               </Box>
             ) : (
-              <Text mt={3} fontSize="sm" color="gray.500">
-                No file uploaded for this session yet.
-              </Text>
+              <></>
             )}
           </Box>
 
@@ -288,7 +292,7 @@ export default function SessionPage() {
             />
 
             <SimpleGrid mt={3} spacing={2} templateColumns="5fr 1fr">
-              <Button colorScheme="blue" onClick={publish}>
+              <Button isDisabled={!text} colorScheme="blue" onClick={publish}>
                 Send Text
               </Button>
 
