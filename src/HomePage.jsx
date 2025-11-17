@@ -14,7 +14,14 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const createSession = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const letters = Array.from(
+      { length: 2 },
+      () => String.fromCharCode(65 + Math.floor(Math.random() * 26)) // A-Z
+    ).join("");
+
+    const digits = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const code = `${letters}${digits}`;
     navigate(`/${code}`);
   };
 
