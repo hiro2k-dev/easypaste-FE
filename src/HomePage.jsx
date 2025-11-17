@@ -14,14 +14,18 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const createSession = () => {
-    const letters = Array.from(
-      { length: 2 },
-      () => String.fromCharCode(65 + Math.floor(Math.random() * 26)) // A-Z
+    const letters = Array.from({ length: 2 }, () =>
+      String.fromCharCode(65 + Math.floor(Math.random() * 26))
     ).join("");
 
-    const digits = Math.floor(100000 + Math.random() * 900000).toString();
+    const digitLength = [4, 5, 6][Math.floor(Math.random() * 3)];
+
+    const min = Math.pow(10, digitLength - 1);
+    const max = Math.pow(10, digitLength) - 1;
+    const digits = Math.floor(min + Math.random() * (max - min + 1)).toString();
 
     const code = `${letters}${digits}`;
+
     navigate(`/${code}`);
   };
 
