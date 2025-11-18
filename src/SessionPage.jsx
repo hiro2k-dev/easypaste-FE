@@ -1,7 +1,7 @@
 // src/SessionPage.jsx
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -21,13 +21,13 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SessionPage() {
   const toast = useToast();
+  const navigate = useNavigate();
   const url = window.location.href;
   const { code } = useParams();
 
   const [text, setText] = useState("");
   const [retrieved, setRetrieved] = useState("");
 
-  // File share state
   const [file, setFile] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -139,6 +139,30 @@ export default function SessionPage() {
     window.open(`${API_URL}/api/file/download/${code}`, "_blank");
   };
 
+  const deleteSession = async () => {
+    try {
+      await axios.delete(`${API_URL}/api/session/${code}`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      toast({
+        title: "Session cleared",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      navigate("/", { replace: true });
+    } catch (err) {
+      toast({
+        title: "Failed to clear session",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+  const sessionExists = retrieved !== "" || fileInfo !== null;
+
   useEffect(() => {
     retrieve();
     fetchFileInfo();
@@ -175,20 +199,31 @@ export default function SessionPage() {
         >
           <Heading size="lg">Easy Paster: Session {code}</Heading>
 
-          <Button
-            size="sm"
-            onClick={() => {
-              copyUrl();
-              toast({
-                title: "URL copied",
-                status: "success",
-                duration: 2000,
-                isClosable: true,
-              });
-            }}
-          >
-            Copy
-          </Button>
+          <Flex gap={2}>
+            <Button
+              size="sm"
+              onClick={() => {
+                copyUrl();
+                toast({
+                  title: "URL copied",
+                  status: "success",
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            >
+              Copy
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="red"
+              variant="outline"
+              onClick={deleteSession}
+              disabled={!sessionExists}
+            >
+              Clear
+            </Button>
+          </Flex>
         </Flex>
         <SimpleGrid
           spacing={4}

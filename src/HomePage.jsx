@@ -9,24 +9,22 @@ import {
   Divider,
   Link,
 } from "@chakra-ui/react";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const createSession = () => {
-    const letters = Array.from({ length: 2 }, () =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26))
-    ).join("");
-
-    const digitLength = [4, 5, 6][Math.floor(Math.random() * 3)];
-
-    const min = Math.pow(10, digitLength - 1);
-    const max = Math.pow(10, digitLength) - 1;
-    const digits = Math.floor(min + Math.random() * (max - min + 1)).toString();
-
-    const code = `${letters}${digits}`;
-
-    navigate(`/${code}`);
+  const createSession = async () => {
+    try {
+      const res = await axios.post(`${API_URL}/api/session`);
+      const code = res.data.code;
+      navigate(`/${code}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create session");
+    }
   };
 
   return (
