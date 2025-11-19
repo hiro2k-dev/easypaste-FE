@@ -331,7 +331,13 @@ export default function SessionPage() {
                 Send Text
               </Button>
 
-              <Button colorScheme="green" onClick={retrieve}>
+              <Button
+                colorScheme="green"
+                onClick={() => {
+                  retrieve();
+                  fetchFileInfo();
+                }}
+              >
                 <LuRefreshCcw />
               </Button>
             </SimpleGrid>
