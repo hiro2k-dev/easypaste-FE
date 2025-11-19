@@ -31,11 +31,22 @@ export default function HomePage() {
     <Container maxW="lg" py={20} centerContent>
       <VStack spacing={6}>
         <Heading size="xl" textAlign="center">
-          Easy Paster
+          Easy Copy
         </Heading>
 
         <Text fontSize="lg" color="gray.600" textAlign="center">
-          A shared clipboard between devices, via a simple link.
+          A simple shared clipboard between devices - no login, no setup.
+        </Text>
+
+        <Text
+          fontSize="sm"
+          color="red.500"
+          fontWeight="semibold"
+          textAlign="center"
+        >
+          ⚠️ Do NOT paste any sensitive data here. For your privacy, delete the
+          session after use. Your session data will be deleted automatically
+          after 10 minutes of inactivity.
         </Text>
 
         <Button
@@ -55,11 +66,19 @@ export default function HomePage() {
             How to use
           </Heading>
           <VStack align="start" spacing={1} fontSize="sm" color="gray.600">
-            <Text>• Click “New session” to generate a shareable link.</Text>
-            <Text>• Send the link to another device or user.</Text>
-            <Text>• Type text and hit “Send Text”.</Text>
-            <Text>• On the other device, click “Refresh” to retrieve.</Text>
-            <Text>• Optionally copy the text or link with one click.</Text>
+            <Text>
+              • Click “New session” to create a temporary shared space.
+            </Text>
+            <Text>• Share the generated link with another device or user.</Text>
+            <Text>• Send text or upload a file (max 10MB).</Text>
+            <Text>
+              • The other device can refresh to retrieve the latest data.
+            </Text>
+            <Text>• Sessions auto-expire after 10 minutes of inactivity.</Text>
+            <Text>
+              • For privacy, avoid sensitive data or clear the session after
+              use.
+            </Text>
           </VStack>
         </Box>
 
