@@ -16,6 +16,7 @@ import {
 import { useClipboard, useToast } from "@chakra-ui/react";
 import { LuRefreshCcw } from "react-icons/lu";
 import { IoMdCloudUpload } from "react-icons/io";
+import { BiCodeCurly } from "react-icons/bi";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -308,9 +309,30 @@ export default function SessionPage() {
                   <b>Current file:</b> {fileInfo.originalName} (
                   {(fileInfo.size / 1024 / 1024).toFixed(2)} MB)
                 </Text>
-                <Button mt={2} onClick={downloadFile}>
-                  Download File
-                </Button>
+
+                <Flex gap="6px" mt={2}>
+                  <Button w="100%" onClick={downloadFile}>
+                    Download File
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      const rawUrl = `${API_URL}/api/file/download/${code}`;
+                      const wgetCmd = `wget --content-disposition "${rawUrl}"`;
+                      navigator.clipboard.writeText(wgetCmd);
+
+                      toast({
+                        title: "wget command copied",
+                        status: "success",
+                        duration: 2000,
+                        isClosable: true,
+                      });
+                    }}
+                    title="Copy wget command"
+                  >
+                    <BiCodeCurly size={17} />
+                  </Button>
+                </Flex>
               </Box>
             ) : (
               <></>
