@@ -17,8 +17,10 @@ import { useClipboard, useToast } from "@chakra-ui/react";
 import { LuRefreshCcw } from "react-icons/lu";
 import { IoMdCloudUpload } from "react-icons/io";
 import { BiCodeCurly } from "react-icons/bi";
+import { v4 as uuidv4 } from "uuid";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const CHUNK_SIZE = 1024 * 1024; // 1MB
 
 export default function SessionPage() {
   const toast = useToast();
@@ -51,7 +53,7 @@ export default function SessionPage() {
         duration: 2000,
         isClosable: true,
       });
-    } catch (err) {
+    } catch {
       toast({
         title: "Failed to send text",
         status: "error",
@@ -65,7 +67,7 @@ export default function SessionPage() {
     try {
       const res = await axios.get(`${API_URL}/api/get/${code}`);
       setRetrieved(res.data.content);
-    } catch (err) {
+    } catch {
       setRetrieved("");
     }
   };
@@ -100,15 +102,33 @@ export default function SessionPage() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("code", code);
-    formData.append("file", file);
+    const fileId = uuidv4();
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
     try {
-      await axios.post(`${API_URL}/api/file/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      for (let i = 0; i < totalChunks; i++) {
+        const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+
+        const formData = new FormData();
+        formData.append("code", code);
+        formData.append("fileId", fileId);
+        formData.append("chunkIndex", i);
+        formData.append("totalChunks", totalChunks);
+        formData.append("fileName", file.name);
+        formData.append("file", chunk);
+
+        await axios.post(`${API_URL}/api/file/chunk`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+
+      await axios.post(`${API_URL}/api/file/finalize`, {
+        code,
+        fileId,
+        totalChunks,
+        fileName: file.name,
       });
 
       await fetchFileInfo();
@@ -153,7 +173,7 @@ export default function SessionPage() {
         isClosable: true,
       });
       navigate("/", { replace: true });
-    } catch (err) {
+    } catch {
       toast({
         title: "Failed to clear session",
         status: "error",
@@ -162,6 +182,7 @@ export default function SessionPage() {
       });
     }
   };
+
   const sessionExists = retrieved !== "" || fileInfo !== null;
 
   useEffect(() => {
@@ -171,6 +192,7 @@ export default function SessionPage() {
 
   const handleSelectFile = (f) => {
     if (!f) return;
+
     if (f.size > 10 * 1024 * 1024) {
       toast({
         title: "File too large (max 10MB)",
@@ -180,6 +202,7 @@ export default function SessionPage() {
       });
       return;
     }
+
     setFile(f);
     toast({
       title: `Selected: ${f.name}`,
