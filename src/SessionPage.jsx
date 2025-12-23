@@ -20,7 +20,10 @@ import { BiCodeCurly } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const CHUNK_SIZE = 512 * 1024; // 512KB
+const CHUNK_SIZE = 1000 * 1024; // 512KB
+const RATE_DELAY = 550;
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default function SessionPage() {
   const toast = useToast();
@@ -37,18 +40,34 @@ export default function SessionPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   const fileInputRef = useRef(null);
+  const lastReqRef = useRef(0);
 
   const { onCopy: copyUrl } = useClipboard(url);
   const { onCopy: copyText } = useClipboard(retrieved || "");
 
+  const waitForSlot = async (RATE_DELAY_TIME = RATE_DELAY, extraDelay = 0) => {
+    const now = Date.now();
+    const diff = now - lastReqRef.current;
+
+    if (diff < RATE_DELAY_TIME) {
+      await sleep(RATE_DELAY_TIME - diff + extraDelay);
+    }
+
+    lastReqRef.current = Date.now();
+  };
+
   const publish = async () => {
     try {
+      await waitForSlot();
       await axios.post(`${API_URL}/api/publish`, {
         type: "text",
         content: text,
         code,
       });
+
+      await waitForSlot();
       await retrieve();
+
       toast({
         title: "Text sent",
         status: "success",
@@ -67,6 +86,7 @@ export default function SessionPage() {
 
   const retrieve = async () => {
     try {
+      await waitForSlot();
       const res = await axios.get(`${API_URL}/api/get/${code}`);
       setRetrieved(res.data.content);
     } catch {
@@ -76,9 +96,10 @@ export default function SessionPage() {
 
   const fetchFileInfo = async () => {
     try {
+      await waitForSlot();
       const res = await axios.get(`${API_URL}/api/file/meta/${code}`);
       setFileInfo(res.data.file);
-    } catch (err) {
+    } catch {
       setFileInfo(null);
     }
   };
@@ -108,14 +129,13 @@ export default function SessionPage() {
 
     const fileId = uuidv4();
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
     setIsUploading(true);
 
     try {
       for (let i = 0; i < totalChunks; i++) {
         const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-
         const formData = new FormData();
+
         formData.append("code", code);
         formData.append("fileId", fileId);
         formData.append("chunkIndex", i);
@@ -123,18 +143,21 @@ export default function SessionPage() {
         formData.append("fileName", file.name);
         formData.append("file", chunk);
 
-        await axios.post(`${API_URL}/api/file/chunk`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await waitForSlot();
+        await axios.post(`${API_URL}/api/file/chunk`, formData);
+        lastReqRef.current = Date.now();
       }
 
+      await waitForSlot();
       await axios.post(`${API_URL}/api/file/finalize`, {
         code,
         fileId,
         totalChunks,
         fileName: file.name,
       });
+      lastReqRef.current = Date.now();
 
+      await waitForSlot();
       await fetchFileInfo();
 
       setFile(null);
@@ -148,9 +171,8 @@ export default function SessionPage() {
         isClosable: true,
       });
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to upload file";
       toast({
-        title: msg,
+        title: err.response?.data?.error || "Failed to upload file",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -167,9 +189,6 @@ export default function SessionPage() {
   const deleteSession = async () => {
     try {
       await axios.delete(`${API_URL}/api/session/${code}`);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
       toast({
         title: "Session cleared",
         status: "success",
@@ -190,10 +209,12 @@ export default function SessionPage() {
   const sessionExists = retrieved !== "" || fileInfo !== null;
 
   useEffect(() => {
-    retrieve();
-    fetchFileInfo();
+    (async () => {
+      await retrieve();
+      await waitForSlot();
+      await fetchFileInfo();
+    })();
   }, [code]);
-
   const handleSelectFile = (f) => {
     if (!f) return;
 
@@ -215,7 +236,6 @@ export default function SessionPage() {
       isClosable: true,
     });
   };
-
   return (
     <Container maxW="4xl" py={6}>
       <VStack spacing={4} align="stretch">
