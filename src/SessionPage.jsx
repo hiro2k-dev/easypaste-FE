@@ -34,6 +34,8 @@ export default function SessionPage() {
   const [file, setFile] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
   const fileInputRef = useRef(null);
 
   const { onCopy: copyUrl } = useClipboard(url);
@@ -82,6 +84,8 @@ export default function SessionPage() {
   };
 
   const uploadFile = async () => {
+    if (isUploading) return;
+
     if (!file) {
       toast({
         title: "Please choose a file first",
@@ -104,10 +108,11 @@ export default function SessionPage() {
 
     const fileId = uuidv4();
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-    console.log(`Uploading file in ${totalChunks} chunks`);
+
+    setIsUploading(true);
+
     try {
       for (let i = 0; i < totalChunks; i++) {
-        console.log(`Uploading chunk ${i + 1} / ${totalChunks}`);
         const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
         const formData = new FormData();
@@ -119,9 +124,7 @@ export default function SessionPage() {
         formData.append("file", chunk);
 
         await axios.post(`${API_URL}/api/file/chunk`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
       }
 
@@ -136,9 +139,7 @@ export default function SessionPage() {
 
       setFile(null);
       setIsDragging(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
 
       toast({
         title: "File uploaded",
@@ -154,6 +155,8 @@ export default function SessionPage() {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -318,7 +321,9 @@ export default function SessionPage() {
             />
 
             <Button
-              isDisabled={!file}
+              isDisabled={!file || isUploading}
+              isLoading={isUploading}
+              loadingText="Uploading..."
               onClick={uploadFile}
               colorScheme="purple"
               mt="12px"
