@@ -20,7 +20,7 @@ import { BiCodeCurly } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const CHUNK_SIZE = 1024 * 1024; // 1MB
+const CHUNK_SIZE = 512 * 1024; // 512KB
 
 export default function SessionPage() {
   const toast = useToast();
