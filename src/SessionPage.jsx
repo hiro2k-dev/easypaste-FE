@@ -104,9 +104,10 @@ export default function SessionPage() {
 
     const fileId = uuidv4();
     const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
+    console.log(`Uploading file in ${totalChunks} chunks`);
     try {
       for (let i = 0; i < totalChunks; i++) {
+        console.log(`Uploading chunk ${i + 1} / ${totalChunks}`);
         const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
         const formData = new FormData();
