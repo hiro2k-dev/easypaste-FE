@@ -117,9 +117,9 @@ export default function SessionPage() {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 20 * 1024 * 1024) {
       toast({
-        title: "File too large (max 10MB)",
+        title: "File too large (max 20MB)",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -218,9 +218,9 @@ export default function SessionPage() {
   const handleSelectFile = (f) => {
     if (!f) return;
 
-    if (f.size > 10 * 1024 * 1024) {
+    if (f.size > 20 * 1024 * 1024) {
       toast({
-        title: "File too large (max 10MB)",
+        title: "File too large (max 20MB)",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -280,7 +280,7 @@ export default function SessionPage() {
         >
           <Box p={4} borderWidth={1} rounded="md" order={{ base: 1, md: 2 }}>
             <Heading size="md" mb={3}>
-              File sharing (max 10MB)
+              File sharing (max 20MB)
             </Heading>
 
             <Box
@@ -319,7 +319,7 @@ export default function SessionPage() {
                 Drop a file here, or click to browse
               </Text>
               <Text fontSize="sm" color="gray.500">
-                Max size 10MB
+                Max size 20MB
               </Text>
 
               {file && (
