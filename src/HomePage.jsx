@@ -31,7 +31,7 @@ export default function HomePage() {
     <Container maxW="lg" py={20} centerContent>
       <VStack spacing={6}>
         <Heading size="xl" textAlign="center">
-          Easy Copy
+          EasyCopy
         </Heading>
 
         <Text fontSize="lg" color="gray.600" textAlign="center">

@@ -43,3 +43,18 @@ coverage/
 # macOS system files
 .AppleDouble
 .LSOverride
+# Added by code-review-graph
+.code-review-graph/
+.cursorrules
+.mcp.json
+.windsurfrules
+.opencode.json
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/*
+.gemini/*
+.qoder/*
+QODER.md
+.github/code-review-graph.instruction.md
+.kiro/*
