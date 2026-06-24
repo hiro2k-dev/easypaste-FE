@@ -85,7 +85,7 @@ export default function HomePage() {
         <Box textAlign="center" pt={8} fontSize="sm" color="gray.500">
           Made with ❤️ by Hiro{" "}
           <Link
-            href="https://hiro2k-dev.github.io/"
+            href="https://hiro2kqt.github.io"
             isExternal
             color="teal.500"
           >
